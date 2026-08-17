@@ -8,11 +8,28 @@ from openpyxl import Workbook
 
 DOWNLOADS = Path.home() / "Downloads"
 
+# Tried in order; utf-8-sig also matches plain utf-8. cp1252 covers the vast
+# majority of Excel-exported CSVs from Western European locales (e.g. "ä").
+ENCODINGS = ["utf-8-sig", "cp1252"]
+
+
+def open_text(csv_path: Path):
+    for encoding in ENCODINGS:
+        try:
+            f = csv_path.open(newline="", encoding=encoding)
+            f.read()
+            f.seek(0)
+            return f
+        except UnicodeDecodeError:
+            f.close()
+    # Last resort: latin-1 never raises, since every byte is a valid code point.
+    return csv_path.open(newline="", encoding="latin-1")
+
 
 def convert(csv_path: Path) -> Path:
     wb = Workbook()
     ws = wb.active
-    with csv_path.open(newline="", encoding="utf-8-sig") as f:
+    with open_text(csv_path) as f:
         sniffer = csv.Sniffer()
         sample = f.read(4096)
         f.seek(0)
