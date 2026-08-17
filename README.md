@@ -27,12 +27,12 @@ python3 -m venv .venv
 4. In the search box, find the **Run Shell Script** action and drag it into
    the workflow area.
 5. Set Shell to `/bin/zsh`, and "Pass input" to **as arguments**.
-6. Paste this into the script box (adjust the path if you cloned this repo
-   elsewhere):
+6. Paste this into the script box, replacing `/path/to/csv-to-xlsx` with
+   wherever you cloned this repo (e.g. `~/code/csv-to-xlsx`):
 
    ```
-   /Users/hopponenmatti/code/csv-to-xlsx/.venv/bin/python3 \
-     /Users/hopponenmatti/code/csv-to-xlsx/csv_to_xlsx.py "$@"
+   /path/to/csv-to-xlsx/.venv/bin/python3 \
+     /path/to/csv-to-xlsx/csv_to_xlsx.py "$@"
    ```
 
 7. Save as **Convert CSV to XLSX**.
