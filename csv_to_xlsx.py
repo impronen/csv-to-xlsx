@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Convert one or more CSV files to .xlsx, writing output to ~/Downloads."""
+"""Convert one or more CSV files to .xlsx, writing output next to each source
+file (falling back to ~/Downloads if that folder isn't writable)."""
 import csv
 import sys
 from pathlib import Path
@@ -40,8 +41,13 @@ def convert(csv_path: Path) -> Path:
         for row in csv.reader(f, dialect):
             ws.append(row)
 
-    out_path = DOWNLOADS / (csv_path.stem + ".xlsx")
-    wb.save(out_path)
+    out_path = csv_path.with_suffix(".xlsx")
+    try:
+        wb.save(out_path)
+    except (PermissionError, OSError):
+        DOWNLOADS.mkdir(exist_ok=True)
+        out_path = DOWNLOADS / (csv_path.stem + ".xlsx")
+        wb.save(out_path)
     return out_path
 
 
@@ -50,7 +56,6 @@ def main(argv: list[str]) -> int:
         print("Usage: csv_to_xlsx.py file1.csv [file2.csv ...]", file=sys.stderr)
         return 1
 
-    DOWNLOADS.mkdir(exist_ok=True)
     for arg in argv:
         csv_path = Path(arg)
         if csv_path.suffix.lower() != ".csv":

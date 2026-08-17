@@ -1,6 +1,7 @@
 # csv-to-xlsx
 
-Converts CSV files to XLSX, writing the result to `~/Downloads`. Used as a
+Converts CSV files to XLSX, writing the result next to the original file
+(falling back to `~/Downloads` if that folder isn't writable). Used as a
 Finder Quick Action (right-click a `.csv` file → Quick Actions → Convert CSV
 to XLSX).
 
@@ -84,8 +85,11 @@ You'll paste this into Automator in the next step — keep it handy.
 ### 7. Use it
 
 Right-click (or two-finger click on trackpad) any `.csv` file in Finder →
-**Quick Actions** → **Convert CSV to XLSX**. The `.xlsx` version appears in
-your **Downloads** folder a moment later.
+**Quick Actions** → **Convert CSV to XLSX**. The `.xlsx` version appears
+right next to it a moment later (or in your **Downloads** folder, if that
+location can't be written to). The first time this runs on a file inside
+Desktop, Documents, or iCloud Drive, macOS may show a one-time permission
+prompt — click **OK/Allow** to grant it.
 
 Optional: you can also assign a keyboard shortcut to it in **System
 Settings → Keyboard → Keyboard Shortcuts → Services**.
