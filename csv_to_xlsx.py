@@ -3,6 +3,7 @@
 file (falling back to ~/Downloads if that folder isn't writable)."""
 import csv
 import sys
+import time
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -13,13 +14,31 @@ DOWNLOADS = Path.home() / "Downloads"
 # majority of Excel-exported CSVs from Western European locales (e.g. "ä").
 ENCODINGS = ["utf-8-sig", "cp1252"]
 
+# Cloud-sync placeholder files (OneDrive, etc.) are downloaded on first read.
+# While that download is in flight, macOS can surface it as EDEADLK instead
+# of just blocking, so retry a few times before giving up.
+CLOUD_MATERIALIZE_RETRIES = 10
+CLOUD_MATERIALIZE_DELAY = 1.0
+
+
+def _read_with_retry(f):
+    for attempt in range(CLOUD_MATERIALIZE_RETRIES):
+        try:
+            data = f.read()
+            f.seek(0)
+            return data
+        except OSError as e:
+            if e.errno == 11 and attempt < CLOUD_MATERIALIZE_RETRIES - 1:
+                time.sleep(CLOUD_MATERIALIZE_DELAY)
+                continue
+            raise
+
 
 def open_text(csv_path: Path):
     for encoding in ENCODINGS:
         try:
             f = csv_path.open(newline="", encoding=encoding)
-            f.read()
-            f.seek(0)
+            _read_with_retry(f)
             return f
         except UnicodeDecodeError:
             f.close()
